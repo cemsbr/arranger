@@ -13,7 +13,7 @@ import br.usp.ime.arranger.service.Arranger;
 public class ArrangerProxyCreator {
 
     private static final String NAMESPACE = "http://service.arranger.ime.usp.br/";
-    private static final String SERVICE_NAME = "ArrangerServiceImplService";
+    private static final String SERVICE_NAME = "ArrangerImplService";
     private static Map<String, Service> cache = null;
 
     public Arranger getClient(final String wsdl)

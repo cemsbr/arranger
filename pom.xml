@@ -8,9 +8,8 @@
   <version>1.0</version>
 
   <modules>
-    <module>webService-common</module>
-    <module>webService-client</module>
-    <module>webService-server</module>
+    <module>frontend</module>
+    <module>backend</module>
     <module>tests</module>
   </modules>
 

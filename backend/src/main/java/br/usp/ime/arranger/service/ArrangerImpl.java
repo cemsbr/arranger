@@ -18,6 +18,7 @@ public class ArrangerImpl implements Arranger {
     public boolean setBehaviors(final List<Behavior> behaviors) {
         synchronized (behaviors) {
             clearBehaviors();
+            this.behaviors.clear();
             this.behaviors.addAll(behaviors);
         }
         return true;
@@ -27,6 +28,7 @@ public class ArrangerImpl implements Arranger {
     public boolean setBehavior(final Behavior behavior) {
         synchronized (behaviors) {
             clearBehaviors();
+            this.behaviors.clear();
             behaviors.add(behavior);
         }
         return true;

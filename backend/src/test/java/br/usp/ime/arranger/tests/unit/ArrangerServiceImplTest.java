@@ -59,7 +59,10 @@ public class ArrangerServiceImplTest {
         beSent.add(cpu2);
         beSent.add(cpu1);
         service.setBehaviors(beSent);
-        assertEquals(beSent, service.getBehaviors());
+        
+        beReceived = service.getBehaviors();
+        assertEquals(beSent.get(0), beReceived.get(0));
+        assertEquals(beSent.get(1), beReceived.get(1));
     }
 
     @Test

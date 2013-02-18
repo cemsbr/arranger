@@ -1,5 +1,6 @@
+*.log
 */.classpath
 */.project
-*/target/
 */.settings/
-*.log
+*/target/
+.pmd
