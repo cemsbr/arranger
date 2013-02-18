@@ -11,7 +11,7 @@ Inc.//DTD Web Application 2.3//EN"
 	</listener>
 
 	<servlet>
-		<servlet-name>Arranger</servlet-name>
+		<servlet-name>Performer</servlet-name>
 		<servlet-class>
 			com.sun.xml.ws.transport.http.servlet.WSServlet
 		</servlet-class>
@@ -19,7 +19,7 @@ Inc.//DTD Web Application 2.3//EN"
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>Arranger</servlet-name>
+		<servlet-name>Performer</servlet-name>
 		<url-pattern>/endpoint</url-pattern>
 	</servlet-mapping>
 

@@ -10,7 +10,7 @@
   <modules>
     <module>frontend</module>
     <module>backend</module>
-    <module>tests</module>
+    <module>rehearsal</module>
   </modules>
 
   <properties>
