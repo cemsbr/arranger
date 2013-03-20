@@ -8,12 +8,14 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class FileCreator {
 
     private static final String PREFIX = "arranger";
     private static final String SUFFIX = ".tmp";
-
+    private static final char[] SUBSET = "0123456789abcdefghijklmnopqrstuvwxyz"
+            .toCharArray();
     private static final Map<Long, File> FILES = new HashMap<>();
 
     public File getFileOfSize(final long sizeInBytes) throws IOException {
@@ -39,13 +41,16 @@ public class FileCreator {
 
     // TODO: size - 1591 - ( ((size+317)/4170 teto - 1)*75 ) - 75 bytes por
     // pacote extra
-    private File createFile(final long size) throws IOException {
-        final File file = File.createTempFile(PREFIX + size + "_", SUFFIX);
+    private File createFile(final long bytes) throws IOException {
+        final File file = File.createTempFile(PREFIX + bytes + "_", SUFFIX);
         final BufferedWriter writer = Files.newBufferedWriter(file.toPath(),
                 Charset.forName("UTF-8"));
+        final Random random = new Random();
 
-        for (int i = 0; i < size; i++) {
-            writer.append("a");
+        char randomChar;
+        for (int i = 0; i < bytes; i++) {
+            randomChar = SUBSET[random.nextInt(SUBSET.length)];
+            writer.append(randomChar);
         }
 
         writer.close();
