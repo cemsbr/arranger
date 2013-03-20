@@ -43,7 +43,7 @@ public class PerformerProxyCreatorTest {
 
     @Before
     public void setUp() throws IllegalArgumentException, IllegalAccessException {
-        PerformerProxyCreator.clearCache();
+        PerformerProxyCreator.destroy();
         creator = new PerformerProxyCreator();
         cacheSpy = spy(new HashMap<String, Service>());
         cacheField.set(null, cacheSpy);
@@ -78,7 +78,7 @@ public class PerformerProxyCreatorTest {
         creator.getProxy(wsdl1);
         assertEquals(1, cacheSpy.size());
 
-        PerformerProxyCreator.clearCache();
+        PerformerProxyCreator.destroy();
         assertEquals(0, cacheSpy.size());
     }
 

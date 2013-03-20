@@ -3,6 +3,10 @@ package br.usp.ime.arranger.behaviors;
 public class BehaviorException extends Exception {
 
     private static final long serialVersionUID = 4141225804033769065L;
+    
+    public BehaviorException() {
+        super();
+    }
 
     public BehaviorException(final Throwable cause) {
         super(cause);

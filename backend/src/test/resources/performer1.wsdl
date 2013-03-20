@@ -25,17 +25,35 @@
 <message name="setBehaviorResponse">
 <part name="parameters" element="tns:setBehaviorResponse"/>
 </message>
-<message name="exchangeMessages">
-<part name="parameters" element="tns:exchangeMessages"/>
-</message>
-<message name="exchangeMessagesResponse">
-<part name="parameters" element="tns:exchangeMessagesResponse"/>
-</message>
 <message name="getBehaviors">
 <part name="parameters" element="tns:getBehaviors"/>
 </message>
 <message name="getBehaviorsResponse">
 <part name="parameters" element="tns:getBehaviorsResponse"/>
+</message>
+<message name="msgStringReqStringRes">
+<part name="parameters" element="tns:msgStringReqStringRes"/>
+</message>
+<message name="msgStringReqStringResResponse">
+<part name="parameters" element="tns:msgStringReqStringResResponse"/>
+</message>
+<message name="msgDataReqStringRes">
+<part name="parameters" element="tns:msgDataReqStringRes"/>
+</message>
+<message name="msgDataReqStringResResponse">
+<part name="parameters" element="tns:msgDataReqStringResResponse"/>
+</message>
+<message name="msgStringReqDataRes">
+<part name="parameters" element="tns:msgStringReqDataRes"/>
+</message>
+<message name="msgStringReqDataResResponse">
+<part name="parameters" element="tns:msgStringReqDataResResponse"/>
+</message>
+<message name="msgDataReqDataRes">
+<part name="parameters" element="tns:msgDataReqDataRes"/>
+</message>
+<message name="msgDataReqDataResResponse">
+<part name="parameters" element="tns:msgDataReqDataResResponse"/>
 </message>
 <portType name="Performer">
 <operation name="run">
@@ -46,19 +64,36 @@
 <operation name="setBehaviors">
 <input wsam:Action="http://service.arranger.ime.usp.br/Performer/setBehaviorsRequest" message="tns:setBehaviors"/>
 <output wsam:Action="http://service.arranger.ime.usp.br/Performer/setBehaviorsResponse" message="tns:setBehaviorsResponse"/>
+<fault message="tns:BehaviorException" name="BehaviorException" wsam:Action="http://service.arranger.ime.usp.br/Performer/setBehaviors/Fault/BehaviorException"/>
 </operation>
 <operation name="setBehavior">
 <input wsam:Action="http://service.arranger.ime.usp.br/Performer/setBehaviorRequest" message="tns:setBehavior"/>
 <output wsam:Action="http://service.arranger.ime.usp.br/Performer/setBehaviorResponse" message="tns:setBehaviorResponse"/>
-</operation>
-<operation name="exchangeMessages">
-<input wsam:Action="http://service.arranger.ime.usp.br/Performer/exchangeMessagesRequest" message="tns:exchangeMessages"/>
-<output wsam:Action="http://service.arranger.ime.usp.br/Performer/exchangeMessagesResponse" message="tns:exchangeMessagesResponse"/>
-<fault message="tns:BehaviorException" name="BehaviorException" wsam:Action="http://service.arranger.ime.usp.br/Performer/exchangeMessages/Fault/BehaviorException"/>
+<fault message="tns:BehaviorException" name="BehaviorException" wsam:Action="http://service.arranger.ime.usp.br/Performer/setBehavior/Fault/BehaviorException"/>
 </operation>
 <operation name="getBehaviors">
 <input wsam:Action="http://service.arranger.ime.usp.br/Performer/getBehaviorsRequest" message="tns:getBehaviors"/>
 <output wsam:Action="http://service.arranger.ime.usp.br/Performer/getBehaviorsResponse" message="tns:getBehaviorsResponse"/>
+</operation>
+<operation name="msgStringReqStringRes">
+<input wsam:Action="http://service.arranger.ime.usp.br/Performer/msgStringReqStringResRequest" message="tns:msgStringReqStringRes"/>
+<output wsam:Action="http://service.arranger.ime.usp.br/Performer/msgStringReqStringResResponse" message="tns:msgStringReqStringResResponse"/>
+<fault message="tns:BehaviorException" name="BehaviorException" wsam:Action="http://service.arranger.ime.usp.br/Performer/msgStringReqStringRes/Fault/BehaviorException"/>
+</operation>
+<operation name="msgDataReqStringRes">
+<input wsam:Action="http://service.arranger.ime.usp.br/Performer/msgDataReqStringResRequest" message="tns:msgDataReqStringRes"/>
+<output wsam:Action="http://service.arranger.ime.usp.br/Performer/msgDataReqStringResResponse" message="tns:msgDataReqStringResResponse"/>
+<fault message="tns:BehaviorException" name="BehaviorException" wsam:Action="http://service.arranger.ime.usp.br/Performer/msgDataReqStringRes/Fault/BehaviorException"/>
+</operation>
+<operation name="msgStringReqDataRes">
+<input wsam:Action="http://service.arranger.ime.usp.br/Performer/msgStringReqDataResRequest" message="tns:msgStringReqDataRes"/>
+<output wsam:Action="http://service.arranger.ime.usp.br/Performer/msgStringReqDataResResponse" message="tns:msgStringReqDataResResponse"/>
+<fault message="tns:BehaviorException" name="BehaviorException" wsam:Action="http://service.arranger.ime.usp.br/Performer/msgStringReqDataRes/Fault/BehaviorException"/>
+</operation>
+<operation name="msgDataReqDataRes">
+<input wsam:Action="http://service.arranger.ime.usp.br/Performer/msgDataReqDataResRequest" message="tns:msgDataReqDataRes"/>
+<output wsam:Action="http://service.arranger.ime.usp.br/Performer/msgDataReqDataResResponse" message="tns:msgDataReqDataResResponse"/>
+<fault message="tns:BehaviorException" name="BehaviorException" wsam:Action="http://service.arranger.ime.usp.br/Performer/msgDataReqDataRes/Fault/BehaviorException"/>
 </operation>
 </portType>
 <binding name="PerformerImplPortBinding" type="tns:Performer">
@@ -83,17 +118,11 @@
 <output>
 <soap:body use="literal"/>
 </output>
+<fault name="BehaviorException">
+<soap:fault name="BehaviorException" use="literal"/>
+</fault>
 </operation>
 <operation name="setBehavior">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
-<operation name="exchangeMessages">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -113,6 +142,54 @@
 <output>
 <soap:body use="literal"/>
 </output>
+</operation>
+<operation name="msgStringReqStringRes">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="BehaviorException">
+<soap:fault name="BehaviorException" use="literal"/>
+</fault>
+</operation>
+<operation name="msgDataReqStringRes">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="BehaviorException">
+<soap:fault name="BehaviorException" use="literal"/>
+</fault>
+</operation>
+<operation name="msgStringReqDataRes">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="BehaviorException">
+<soap:fault name="BehaviorException" use="literal"/>
+</fault>
+</operation>
+<operation name="msgDataReqDataRes">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="BehaviorException">
+<soap:fault name="BehaviorException" use="literal"/>
+</fault>
 </operation>
 </binding>
 <service name="PerformerImplService">

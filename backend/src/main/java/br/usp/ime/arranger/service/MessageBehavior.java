@@ -2,22 +2,30 @@ package br.usp.ime.arranger.service;
 
 import java.net.MalformedURLException;
 
+import javax.activation.DataHandler;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import br.usp.ime.arranger.behaviors.AbstractBehavior;
 import br.usp.ime.arranger.behaviors.BehaviorException;
-import br.usp.ime.arranger.utils.StringUtils;
+import br.usp.ime.arranger.utils.CommUtils;
 
 public class MessageBehavior extends AbstractBehavior {
 
     private String destWsdl;
-    private int requestBytes;
-    private int responseBytes;
+    private long requestBytes;
+    private long responseBytes;
+    private static final CommUtils COMM = new CommUtils();
+    private static final Logger LOG = LogManager
+            .getLogger(MessageBehavior.class.getName());
 
-    private transient StringUtils strUtils = null;
-    private transient PerformerProxyCreator clientCreator = null;
-    private transient boolean readyToRun = false;
+    // MTOM will be used for messages of size >= MTOM_THRESHOLD bytes to reduce
+    // memory consumption.
+    private static final int MTOM_THRESHOLD = 1024 * 1024;
 
-    public MessageBehavior(final String destWsdl, final int requestBytes,
-            final int responseBytes) {
+    public MessageBehavior(final String destWsdl, final long requestBytes,
+            final long responseBytes) {
         super();
         this.destWsdl = destWsdl;
         this.requestBytes = requestBytes;
@@ -26,27 +34,58 @@ public class MessageBehavior extends AbstractBehavior {
 
     @Override
     public void run() throws BehaviorException {
-        beReady();
         try {
-            final Performer destination = clientCreator.getProxy(destWsdl);
-            final String message = strUtils.getStringOfLength(requestBytes);
-            destination.exchangeMessages(message, responseBytes);
+            talkToPerformer();
         } catch (MalformedURLException e) {
-            throw new BehaviorException(e);
+            throw new BehaviorException("MalformedURL: " + destWsdl + ".", e);
         }
     }
 
-    @Override
-    public void destroy() {
-        PerformerProxyCreator.clearCache();
+    private void talkToPerformer() throws MalformedURLException,
+            BehaviorException {
+        final Performer performer = COMM.getPerformer(destWsdl);
+        final boolean requestIsBig = (requestBytes >= MTOM_THRESHOLD);
+        final boolean responseIsBig = (responseBytes >= MTOM_THRESHOLD);
+
+        if (requestIsBig) {
+            makeDataReq(responseIsBig, performer);
+        } else {
+            makeStringReq(responseIsBig, performer);
+        }
     }
 
-    private void beReady() {
-        if (!readyToRun) {
-            strUtils = new StringUtils();
-            clientCreator = new PerformerProxyCreator();
-            readyToRun = true;
+    private void makeDataReq(final boolean responseIsBig,
+            final Performer performer) throws BehaviorException {
+        LOG.info("Request = DataHandler.");
+        final DataHandler dhOut = COMM.getDataHandler(requestBytes);
+        if (responseIsBig) {
+            LOG.info("Response = DataHandler");
+            final DataHandler dhIn = performer.msgDataReqDataRes(dhOut,
+                    responseBytes);
+            LOG.debug("Received DataHandler. Writing to file...");
+            COMM.receiveDataHandler(dhIn);
+        } else {
+            LOG.info("Response = String");
+            performer.msgDataReqStringRes(dhOut, (int) responseBytes);
         }
+        LOG.debug("Finished DataHandler request.");
+    }
+
+    private void makeStringReq(final boolean responseIsBig,
+            final Performer performer) throws BehaviorException {
+        LOG.info("Request = String.");
+        final String msg = COMM.getStringMessage((int) requestBytes);
+        if (responseIsBig) {
+            LOG.info("Response = DataHandler.");
+            final DataHandler dhIn = performer.msgStringReqDataRes(msg,
+                    responseBytes);
+            LOG.debug("Received DataHandler. Writing to file...");
+            COMM.receiveDataHandler(dhIn);
+        } else {
+            LOG.info("Response = String.");
+            performer.msgStringReqStringRes(msg, (int) responseBytes);
+        }
+        LOG.debug("Finished DataHandler request.");
     }
 
     // Needed for serialization
@@ -62,19 +101,19 @@ public class MessageBehavior extends AbstractBehavior {
         this.destWsdl = destWsdl;
     }
 
-    public int getRequestBytes() {
+    public long getRequestBytes() {
         return requestBytes;
     }
 
-    public void setRequestBytes(final int bytes) {
+    public void setRequestBytes(final long bytes) {
         this.requestBytes = bytes;
     }
 
-    public int getResponseBytes() {
+    public long getResponseBytes() {
         return responseBytes;
     }
 
-    public void setResponseBytes(final int bytes) {
+    public void setResponseBytes(final long bytes) {
         this.responseBytes = bytes;
     }
 }

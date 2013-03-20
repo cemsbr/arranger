@@ -14,12 +14,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import br.usp.ime.arranger.utils.StringUtils;
 import br.usp.ime.arranger.behaviors.Behavior;
 import br.usp.ime.arranger.behaviors.BehaviorException;
 import br.usp.ime.arranger.behaviors.SleepBehavior;
 import br.usp.ime.arranger.service.Performer;
 import br.usp.ime.arranger.service.PerformerImpl;
+import br.usp.ime.arranger.utils.StringUtils;
 
 public class PerformerImplTest {
 
@@ -41,7 +41,7 @@ public class PerformerImplTest {
     }
 
     @Test
-    public void shouldSaveABehavior() {
+    public void shouldSaveABehavior() throws BehaviorException {
         service.setBehavior(sleep1);
         beReceived = service.getBehaviors();
 
@@ -49,7 +49,7 @@ public class PerformerImplTest {
     }
 
     @Test
-    public void shouldPreserveBehaviorsOrder() {
+    public void shouldPreserveBehaviorsOrder() throws BehaviorException {
         beSent.add(sleep1);
         beSent.add(sleep2);
         service.setBehaviors(beSent);
@@ -82,12 +82,13 @@ public class PerformerImplTest {
     @Test
     public void shouldCallRunWhenInReceiveMessage() throws BehaviorException {
         final Performer spy = spy(service);
-        spy.exchangeMessages("42", 0);
+        spy.msgStringReqStringRes("42", 0);
         verify(spy).run();
     }
 
     @Test
-    public void shouldClearBehaviorAfterSettingNewBehavior() {
+    public void shouldClearBehaviorAfterSettingNewBehavior()
+            throws BehaviorException {
         final Behavior cpu1Spy = spy(sleep1);
 
         service.setBehavior(cpu1Spy);
@@ -98,7 +99,8 @@ public class PerformerImplTest {
     }
 
     @Test
-    public void shouldClearBehaviorAfterSettingNewBehaviors() {
+    public void shouldClearBehaviorAfterSettingNewBehaviors()
+            throws BehaviorException {
         final Behavior cpu1Spy = spy(sleep1);
         final Behavior cpu2Spy = spy(sleep2);
         final List<Behavior> beSentSpy = new ArrayList<>(2);
@@ -120,7 +122,7 @@ public class PerformerImplTest {
     public void testReturnSizeWhenExchangingMessages()
             throws BehaviorException, UnsupportedEncodingException {
         final int size = 42;
-        final String response = service.exchangeMessages("message", size);
+        final String response = service.msgStringReqStringRes("message", size);
         final StringUtils strUtils = new StringUtils();
         assertEquals(size, strUtils.getSizeInBytes(response));
     }

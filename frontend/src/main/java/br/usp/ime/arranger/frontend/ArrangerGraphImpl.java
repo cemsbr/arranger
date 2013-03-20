@@ -9,24 +9,38 @@ public class ArrangerGraphImpl extends
         ArrangerGraph {
 
     @Override
-    public boolean addEdge(final MessageEdge msg, final PerformerNode source,
+    public boolean addEdge(final MessageEdge edge, final PerformerNode source,
             final PerformerNode dest) {
-        final boolean result = super.addEdge(msg, source, dest);
-        addMessageBehavior(msg, source, dest);
+        final boolean result = super.addEdge(edge, source, dest);
+        addMessageBehavior(edge, source, dest);
         return result;
     }
 
-    private void addMessageBehavior(final MessageEdge msgEx,
+    /**
+     * Adds a MessageBehavior to source.
+     * 
+     * @param edge
+     * @param source
+     * @param dest
+     */
+    private void addMessageBehavior(final MessageEdge edge,
             final PerformerNode source, final PerformerNode dest) {
-        final MessageBehavior behavior = getMessageBehavior(msgEx, dest);
+        final MessageBehavior behavior = getMessageBehavior(edge, dest);
         source.addBehavior(behavior);
     }
 
-    private MessageBehavior getMessageBehavior(final MessageEdge msgEx,
+    /**
+     * Translates MessageEdge to MessageBehavior.
+     * 
+     * @param edge
+     * @param dest
+     * @return
+     */
+    private MessageBehavior getMessageBehavior(final MessageEdge edge,
             final PerformerNode dest) {
         final String wsdl = dest.getWsdl();
-        final int reqSize = msgEx.getRequestSize();
-        final int resSize = msgEx.getResponseSize();
+        final int reqSize = edge.getRequestSize();
+        final int resSize = edge.getResponseSize();
 
         return new MessageBehavior(wsdl, reqSize, resSize);
     }

@@ -1,0 +1,2 @@
+Test BehaviorException unmarshalling
+Verify if change in proxy is required for streaming

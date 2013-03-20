@@ -11,5 +11,5 @@ public interface Behavior {
 
     void run() throws BehaviorException;
 
-    void destroy();
+    void destroy() throws BehaviorException;
 }

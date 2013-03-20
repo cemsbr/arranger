@@ -2,6 +2,7 @@ package br.usp.ime.arranger.service;
 
 import java.util.List;
 
+import javax.activation.DataHandler;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
@@ -19,14 +20,27 @@ import br.usp.ime.arranger.behaviors.SleepBehavior;
 public interface Performer {
 
     @WebMethod
-    boolean setBehaviors(final List<Behavior> behaviors);
-
-    @WebMethod
-    boolean setBehavior(final Behavior behavior);
-
-    @WebMethod
-    String exchangeMessages(final String request, final int responseBytes)
+    boolean setBehaviors(final List<Behavior> behaviors)
             throws BehaviorException;
+
+    @WebMethod
+    boolean setBehavior(final Behavior behavior) throws BehaviorException;
+
+    @WebMethod
+    String msgStringReqStringRes(final String request, final int responseBytes)
+            throws BehaviorException;
+
+    @WebMethod
+    String msgDataReqStringRes(final DataHandler request,
+            final int responseBytes) throws BehaviorException;
+
+    @WebMethod
+    DataHandler msgStringReqDataRes(final String request,
+            final long responseBytes) throws BehaviorException;
+
+    @WebMethod
+    DataHandler msgDataReqDataRes(final DataHandler request,
+            final long responseBytes) throws BehaviorException;
 
     @WebMethod
     void run() throws BehaviorException;

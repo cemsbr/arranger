@@ -16,6 +16,7 @@ import br.usp.ime.arranger.behaviors.FibonacciBehavior;
 import br.usp.ime.arranger.service.MessageBehavior;
 import br.usp.ime.arranger.service.Performer;
 import br.usp.ime.arranger.service.PerformerProxyCreator;
+import br.usp.ime.arranger.tests.functional.PerformerPublisher;
 import br.usp.ime.arranger.utils.StringUtils;
 import eu.choreos.vv.clientgenerator.Item;
 import eu.choreos.vv.exceptions.MockDeploymentException;
@@ -24,7 +25,7 @@ import eu.choreos.vv.interceptor.MessageInterceptor;
 
 public class PerformerTest {
 
-    private static Server servers;
+    private static PerformerPublisher servers;
     private static Performer ws1;
     private static MessageInterceptor interceptor;
 
@@ -33,8 +34,8 @@ public class PerformerTest {
     @BeforeClass
     public static void setUpClass() throws WSDLException,
             MockDeploymentException, XmlException, IOException {
-        servers = new Server();
-        final List<String> wsdls = servers.start(2);
+        servers = new PerformerPublisher();
+        final List<String> wsdls = servers.publish(2);
         final PerformerProxyCreator clientCreator = new PerformerProxyCreator();
         ws1 = clientCreator.getProxy(wsdls.get(0));
         interceptor = RehearsalTest.intercept(wsdls.get(1));
