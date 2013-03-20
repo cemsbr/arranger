@@ -1,6 +1,7 @@
 *.log
 */.classpath
-.project
-.settings/
 */target/
 .pmd
+.project
+.settings/
+bin/
