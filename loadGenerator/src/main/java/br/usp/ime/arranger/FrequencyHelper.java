@@ -12,33 +12,57 @@ import java.util.Calendar;
  */
 public class FrequencyHelper {
     // period, threadPeriod are in milliseconds.
+    private int maxThreads, executions;
     private double period, threadPeriod;
-    private int frequency;
-    private int totalThreads;
-    private final int maxThreads;
+    private int frequency, totalThreads;
     private long startTime;
-    
-    private static final int DELAY = 100;
 
-    public FrequencyHelper(final int maxThreads) {
+    public static final int DELAY = 100;
+
+    /**
+     * 
+     * @param maxThreads
+     * @param frequency
+     *            requests per minute.
+     * @param executions
+     *            total number of requests.
+     */
+    public FrequencyHelper(final int maxThreads, final int frequency,
+            final int executions) {
+        this(maxThreads, executions);
+        setFrequency(frequency); // NOPMD
+    }
+
+    /**
+     * 
+     * @param maxThreads
+     *            total number of requests.
+     * @param executions
+     */
+    public FrequencyHelper(final int maxThreads, final int executions) {
+        this.executions = executions;
         this.maxThreads = maxThreads;
+    }
+
+    /**
+     * 
+     * @param frequency
+     *            requests per minute.
+     */
+    public void setFrequency(final int frequency) {
+        this.frequency = frequency;
+
+        totalThreads = Math.min(maxThreads, executions);
+        period = 60000.0 / frequency;
+        threadPeriod = totalThreads * period;
     }
 
     public void setStartTime() {
         setStartTime(getCurrentTime());
     }
 
-    /**
-     * @param Frequency
-     *            per minute.
-     * @throws InvalidArgumentException
-     * @throws TooSmallPeriodException
-     */
-    public void setFrequency(final int frequencyPerMin) {
-        this.frequency = frequencyPerMin;
-        totalThreads = Math.min(maxThreads, frequencyPerMin);
-        period = 60000.0 / frequencyPerMin;
-        threadPeriod = totalThreads * period;
+    public void setExecutions(final int executions) {
+        this.executions = executions;
     }
 
     public long getSleepTime(final int threadNumber, final int iteration) {
@@ -46,7 +70,7 @@ public class FrequencyHelper {
         return Math.round(eventTime - getCurrentTime());
     }
 
-    public long getEventTime(final int threadNumber, final int iteration) {
+    private long getEventTime(final int threadNumber, final int iteration) {
         return startTime + getEventDelay(threadNumber, iteration) + DELAY;
     }
 
@@ -62,18 +86,20 @@ public class FrequencyHelper {
 
     public int getTotalRequests(final int threadNumber) {
         double requests;
-        if (threadNumber < frequency % totalThreads) {
-            requests = frequency / totalThreads + 1;
+        if (threadNumber < executions % totalThreads) {
+            requests = executions / totalThreads + 1;
         } else {
-            requests = frequency / totalThreads;
+            requests = executions / totalThreads;
         }
         return (int) Math.round(requests);
     }
 
-    // Trivial setters & getters
-
     public void setStartTime(final long startTime) {
         this.startTime = startTime;
+    }
+
+    public int getFrequency() {
+        return frequency;
     }
 
     public double getPeriod() {

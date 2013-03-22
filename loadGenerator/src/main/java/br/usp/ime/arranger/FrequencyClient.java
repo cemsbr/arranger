@@ -8,20 +8,29 @@ import br.usp.ime.arranger.behaviors.BehaviorException;
 
 public class FrequencyClient extends AbstractClient implements Runnable {
 
-    private static FrequencyHelper freqHelper;
+    private static FrequencyHelper freqHelper = null;
 
     private static AtomicInteger successes;
     private static AtomicInteger failures;
-    private static double successTime;
+    private static double successTime = -1;
 
-    public static void setup(final FrequencyHelper freqHelper,
-            final int successTime) {
-        FrequencyClient.freqHelper = freqHelper;
-        FrequencyClient.successTime = successTime;
-    }
-
+    /**
+     * Must set FrequencyHelper and SuccessTime before.
+     * 
+     * @param threadNumber
+     * @throws MalformedURLException
+     */
     public FrequencyClient(final int threadNumber) throws MalformedURLException {
         super(threadNumber);
+
+    }
+
+    public static void setFrequencyHelper(final FrequencyHelper freqHelper) {
+        FrequencyClient.freqHelper = freqHelper;
+    }
+
+    public static void setSuccessTime(final int successTime) {
+        FrequencyClient.successTime = successTime;
     }
 
     public static void resetStatistics() {
@@ -38,29 +47,21 @@ public class FrequencyClient extends AbstractClient implements Runnable {
     }
 
     @Override
-    public void run() {
-        final int requests = freqHelper.getTotalRequests(threadNumber);
-
-        latch.countDown();
-        try {
-            latch.await();
-        } catch (InterruptedException e1) {
-            logError("CountDownLatch await error", e1);
+    public void run() throws IllegalStateException {
+        if (freqHelper == null || successTime < 0) {
+            throw new IllegalStateException(
+                    "Must set FrequencyHelper and successTime in FrequencyClient");
         }
 
+        final int requests = freqHelper.getTotalRequests(threadNumber);
+        waitOtherThreads();
         freqHelper.setStartTime();
 
         for (int i = 0; i < requests; i++) {
             try {
-                final long sleepTime = freqHelper.getSleepTime(threadNumber, i);
-                if (sleepTime < 0) {
-                    logError(String.format(
-                            "Sleep time %d on thread %d, request %d.",
-                            sleepTime, threadNumber, i));
-                    failures.incrementAndGet();
+                if (!canWait(i)) {
                     continue;
                 }
-                Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 logError("Sleep < 0");
             }
@@ -71,6 +72,31 @@ public class FrequencyClient extends AbstractClient implements Runnable {
                 logError("simulate()", e);
                 failures.incrementAndGet();
             }
+        }
+    }
+
+    private boolean canWait(final int request) throws InterruptedException {
+        boolean canWait = true; // NOPMD - time restriction
+
+        final long sleepTime = freqHelper.getSleepTime(threadNumber, request);
+        if (sleepTime < 0) {
+            logError(String.format("Sleep time %d on thread %d, request %d.",
+                    sleepTime, threadNumber, request));
+            failures.incrementAndGet();
+            canWait = false;
+        } else {
+            Thread.sleep(sleepTime);
+        }
+
+        return canWait;
+    }
+
+    private void waitOtherThreads() {
+        latch.countDown();
+        try {
+            latch.await();
+        } catch (InterruptedException e1) {
+            logError("CountDownLatch await error", e1);
         }
     }
 

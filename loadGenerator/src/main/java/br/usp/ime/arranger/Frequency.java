@@ -13,58 +13,51 @@ public final class Frequency extends AbstractLoadGenerator {
     // Requests per minute
     private int minFreq, maxFreq, step;
     // milliseconds
-    private int successTime;
-    private int maxThreads;
+    private int measurements, maxThreads;
     private float successRatio;
 
     @Override
     public void generateLoad(final String[] args, final int start)
             throws MalformedURLException, IllegalArgumentException {
         readArgs(args, start);
-        freqHelper = new FrequencyHelper(maxThreads);
-        setUpClients();
         runSimulations();
     }
 
     public static String getHelpMessage() {
-        return "minFreq maxFreq step successTime successRatio maxThreads";
+        return "minFreq maxFreq step measurements successTime successRatio maxThreads";
     }
 
     private void readArgs(final String[] args, final int start) {
-        if (args.length < 6 + start) {
+        if (args.length < 7 + start) {
             throw new IllegalArgumentException();
         }
 
+        int index = start;
         try {
-            minFreq = Integer.parseInt(args[start]);
-            maxFreq = Integer.parseInt(args[start + 1]);
-            step = Integer.parseInt(args[start + 2]);
-            successTime = Integer.parseInt(args[start + 3]);
-            successRatio = Float.parseFloat(args[start + 4]);
-            maxThreads = Integer.parseInt(args[start + 5]);
+            minFreq = Integer.parseInt(args[index++]);
+            maxFreq = Integer.parseInt(args[index++]);
+            step = Integer.parseInt(args[index++]);
+            measurements = Integer.parseInt(args[index++]);
+            FrequencyClient.setSuccessTime(Integer.parseInt(args[index++]));
+            successRatio = Float.parseFloat(args[index++]);
+            maxThreads = Integer.parseInt(args[index++]);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private void setUpClients() {
-        FrequencyClient.setup(freqHelper, successTime);
-    }
-
     private void runSimulations() throws MalformedURLException {
-        warmUp(minFreq);
+        warmUp();
+        freqHelper.setExecutions(measurements);
 
-        String result;
         for (int frequency = minFreq; frequency <= maxFreq; frequency += step) {
-            logTitle(frequency);
-
             freqHelper.setFrequency(frequency);
             logFrequency();
-
-            runSimulation(freqHelper.getTotalThreads());
+            runSimulation();
 
             if (hasTimedOut()) {
-                result = String.format("result: %d/min", frequency - step);
+                final String result = String.format("result: %d/min", frequency
+                        - step);
                 CONSOLE.info(result);
                 GRAPH.info("# " + result);
                 break;
@@ -72,33 +65,29 @@ public final class Frequency extends AbstractLoadGenerator {
         }
     }
 
-    protected void warmUp(final int freq) throws MalformedURLException {
+    protected void warmUp() throws MalformedURLException {
         CONSOLE.info("warmup");
         GRAPH.info("# warmup");
 
-        freqHelper.setFrequency(freq);
-        final int threads = freqHelper.getTotalThreads();
-
-        runSimulation(threads);
+        freqHelper = new FrequencyHelper(maxThreads, minFreq, minFreq);
+        FrequencyClient.setFrequencyHelper(freqHelper);
+        runSimulation();
     }
 
-    protected void runSimulation(final int threads)
-            throws MalformedURLException {
+    protected void runSimulation() throws MalformedURLException {
         resetClients();
-        runThreads(threads);
-    }
-
-    private void logTitle(final int frequency) {
-        final String title = String.format("# %d/min", frequency);
-        CONSOLE.info(title);
-        GRAPH.info(title);
+        runThreads();
     }
 
     private void logFrequency() {
-        final String msg = String.format("# period=%s, threadPeriod=%s",
-                freqHelper.getPeriod(), freqHelper.getThreadPeriod());
-        CONSOLE.info(msg);
-        GRAPH.info(msg);
+        final int freq = freqHelper.getFrequency();
+        final double period = freqHelper.getPeriod();
+        final double tPeriod = freqHelper.getThreadPeriod();
+
+        final String title = String.format(
+                "# %d/min, period=%s, threadPeriod=%s", freq, period, tPeriod);
+        CONSOLE.info(title);
+        GRAPH.info(title);
     }
 
     private void resetClients() {
@@ -122,25 +111,30 @@ public final class Frequency extends AbstractLoadGenerator {
     }
 
     @SuppressWarnings("PMD.WhileLoopsMustUseBraces")
-    private void runThreads(final int totalThreads)
-            throws MalformedURLException {
+    private void runThreads() throws MalformedURLException {
+        final int totalThreads = freqHelper.getTotalThreads();
         CONSOLE.debug("Using " + totalThreads + " threads");
+
         final ExecutorService executor = Executors
                 .newFixedThreadPool(totalThreads);
-
-        Runnable worker;
-        for (int threadNumber = 0; threadNumber < totalThreads; threadNumber++) {
-            worker = new FrequencyClient(threadNumber); // NOPMD
-            executor.execute(worker);
-        }
-
+        createWorkers(totalThreads, executor);
         executor.shutdown();
+
         try {
             while (!executor
                     .awaitTermination(THREADS_TIMEOUT, TimeUnit.SECONDS))
                 ; // NOPMD
         } catch (InterruptedException e) {
             executor.shutdownNow();
+        }
+    }
+
+    private void createWorkers(final int totalThreads,
+            final ExecutorService executor) throws MalformedURLException {
+        Runnable worker;
+        for (int threadNumber = 0; threadNumber < totalThreads; threadNumber++) {
+            worker = new FrequencyClient(threadNumber); // NOPMD
+            executor.execute(worker);
         }
     }
 }

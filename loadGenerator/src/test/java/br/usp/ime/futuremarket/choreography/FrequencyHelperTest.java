@@ -2,6 +2,8 @@ package br.usp.ime.futuremarket.choreography;
 
 import static org.junit.Assert.assertEquals;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Calendar;
 
 import org.junit.BeforeClass;
@@ -10,12 +12,19 @@ import org.junit.Test;
 import br.usp.ime.arranger.FrequencyHelper;
 
 public class FrequencyHelperTest {
+
     private static Calendar calendar;
     private long startTime;
+    private static Method pvtMethod;
+    private FrequencyHelper helper;
 
     @BeforeClass
-    public static void setCalendarInstance() {
+    public static void setCalendarInstance() throws NoSuchMethodException,
+            SecurityException {
         calendar = Calendar.getInstance();
+        pvtMethod = FrequencyHelper.class.getDeclaredMethod("getEventTime",
+                Integer.TYPE, Integer.TYPE);
+        pvtMethod.setAccessible(true);
     }
 
     private long getTime() {
@@ -30,30 +39,35 @@ public class FrequencyHelperTest {
      * t99: 05940, 11940, 17940, 23940, ..., 59940 (10)
      */
     @Test
-    public void case1Test() {
-        final FrequencyHelper freqHelper = new FrequencyHelper(100);
-        freqHelper.setFrequency(1000);
+    public void case1Test() throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        helper = new FrequencyHelper(100, 1000, 1000);
 
-        assertEquals(100, freqHelper.getTotalThreads());
+        assertEquals(100, helper.getTotalThreads());
 
+        setStartTime();
+
+        assertEquals(startTime, getEventTime(0, 0));
+        assertEquals(startTime + 6000, getEventTime(0, 1));
+        assertEquals(startTime + 54000, getEventTime(0, 9));
+
+        assertEquals(startTime + 60, getEventTime(1, 0));
+        assertEquals(startTime + 6060, getEventTime(1, 1));
+        assertEquals(startTime + 54060, getEventTime(1, 9));
+
+        assertEquals(startTime + 5940, getEventTime(99, 0));
+        assertEquals(startTime + 11940, getEventTime(99, 1));
+        assertEquals(startTime + 59940, getEventTime(99, 9));
+
+        assertEquals(10, helper.getTotalRequests(0));
+        assertEquals(10, helper.getTotalRequests(1));
+        assertEquals(10, helper.getTotalRequests(2));
+    }
+
+    private void setStartTime() {
         startTime = getTime();
-        freqHelper.setStartTime(startTime);
-
-        assertEquals(startTime, freqHelper.getEventTime(0, 0));
-        assertEquals(startTime + 6000, freqHelper.getEventTime(0, 1));
-        assertEquals(startTime + 54000, freqHelper.getEventTime(0, 9));
-
-        assertEquals(startTime + 60, freqHelper.getEventTime(1, 0));
-        assertEquals(startTime + 6060, freqHelper.getEventTime(1, 1));
-        assertEquals(startTime + 54060, freqHelper.getEventTime(1, 9));
-
-        assertEquals(startTime + 5940, freqHelper.getEventTime(99, 0));
-        assertEquals(startTime + 11940, freqHelper.getEventTime(99, 1));
-        assertEquals(startTime + 59940, freqHelper.getEventTime(99, 9));
-
-        assertEquals(10, freqHelper.getTotalRequests(0));
-        assertEquals(10, freqHelper.getTotalRequests(1));
-        assertEquals(10, freqHelper.getTotalRequests(2));
+        helper.setStartTime(startTime);
+        startTime += FrequencyHelper.DELAY;
     }
 
     /*-
@@ -61,21 +75,20 @@ public class FrequencyHelperTest {
      * t1: 0, 15k, 30k, 45k
      */
     @Test
-    public void case2aTest() {
-        final FrequencyHelper freqHelper = new FrequencyHelper(1);
-        freqHelper.setFrequency(4);
+    public void case2aTest() throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        helper = new FrequencyHelper(1, 4, 4);
 
-        assertEquals(1, freqHelper.getTotalThreads());
+        assertEquals(1, helper.getTotalThreads());
 
-        startTime = getTime();
-        freqHelper.setStartTime(startTime);
+        setStartTime();
 
-        assertEquals(startTime, freqHelper.getEventTime(0, 0));
-        assertEquals(startTime + 15000, freqHelper.getEventTime(0, 1));
-        assertEquals(startTime + 30000, freqHelper.getEventTime(0, 2));
-        assertEquals(startTime + 45000, freqHelper.getEventTime(0, 3));
+        assertEquals(startTime, getEventTime(0, 0));
+        assertEquals(startTime + 15000, getEventTime(0, 1));
+        assertEquals(startTime + 30000, getEventTime(0, 2));
+        assertEquals(startTime + 45000, getEventTime(0, 3));
 
-        assertEquals(4, freqHelper.getTotalRequests(0));
+        assertEquals(4, helper.getTotalRequests(0));
     }
 
     /*-
@@ -84,23 +97,22 @@ public class FrequencyHelperTest {
      * t2: 15k, 45k
      */
     @Test
-    public void case2bTest() {
-        final FrequencyHelper freqHelper = new FrequencyHelper(2);
-        freqHelper.setFrequency(4);
+    public void case2bTest() throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        helper = new FrequencyHelper(2, 4, 4);
 
-        assertEquals(2, freqHelper.getTotalThreads());
+        assertEquals(2, helper.getTotalThreads());
 
-        startTime = getTime();
-        freqHelper.setStartTime(startTime);
+        setStartTime();
 
-        assertEquals(startTime, freqHelper.getEventTime(0, 0));
-        assertEquals(startTime + 30000, freqHelper.getEventTime(0, 1));
+        assertEquals(startTime, getEventTime(0, 0));
+        assertEquals(startTime + 30000, getEventTime(0, 1));
 
-        assertEquals(startTime + 15000, freqHelper.getEventTime(1, 0));
-        assertEquals(startTime + 45000, freqHelper.getEventTime(1, 1));
+        assertEquals(startTime + 15000, getEventTime(1, 0));
+        assertEquals(startTime + 45000, getEventTime(1, 1));
 
-        assertEquals(2, freqHelper.getTotalRequests(0));
-        assertEquals(2, freqHelper.getTotalRequests(1));
+        assertEquals(2, helper.getTotalRequests(0));
+        assertEquals(2, helper.getTotalRequests(1));
     }
 
     /*-
@@ -110,25 +122,24 @@ public class FrequencyHelperTest {
      * t3: 30k
      */
     @Test
-    public void case2cTest() {
-        final FrequencyHelper freqHelper = new FrequencyHelper(3);
-        freqHelper.setFrequency(4);
+    public void case2cTest() throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        helper = new FrequencyHelper(3, 4, 4);
 
-        assertEquals(3, freqHelper.getTotalThreads());
+        assertEquals(3, helper.getTotalThreads());
 
-        startTime = getTime();
-        freqHelper.setStartTime(startTime);
+        setStartTime();
 
-        assertEquals(startTime, freqHelper.getEventTime(0, 0));
-        assertEquals(startTime + 45000, freqHelper.getEventTime(0, 1));
+        assertEquals(startTime, getEventTime(0, 0));
+        assertEquals(startTime + 45000, getEventTime(0, 1));
 
-        assertEquals(startTime + 15000, freqHelper.getEventTime(1, 0));
+        assertEquals(startTime + 15000, getEventTime(1, 0));
 
-        assertEquals(startTime + 30000, freqHelper.getEventTime(2, 0));
+        assertEquals(startTime + 30000, getEventTime(2, 0));
 
-        assertEquals(2, freqHelper.getTotalRequests(0));
-        assertEquals(1, freqHelper.getTotalRequests(1));
-        assertEquals(1, freqHelper.getTotalRequests(2));
+        assertEquals(2, helper.getTotalRequests(0));
+        assertEquals(1, helper.getTotalRequests(1));
+        assertEquals(1, helper.getTotalRequests(2));
     }
 
     /*-
@@ -139,22 +150,21 @@ public class FrequencyHelperTest {
      * t4: 45k
      */
     @Test
-    public void case2dTest() {
-        final FrequencyHelper freqHelper = new FrequencyHelper(4);
-        freqHelper.setFrequency(4);
+    public void case2dTest() throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        helper = new FrequencyHelper(4, 4, 4);
 
-        assertEquals(4, freqHelper.getTotalThreads());
+        assertEquals(4, helper.getTotalThreads());
 
-        startTime = getTime();
-        freqHelper.setStartTime(startTime);
+        setStartTime();
 
-        assertEquals(startTime, freqHelper.getEventTime(0, 0));
-        assertEquals(startTime + 15000, freqHelper.getEventTime(1, 0));
-        assertEquals(startTime + 30000, freqHelper.getEventTime(2, 0));
-        assertEquals(startTime + 45000, freqHelper.getEventTime(3, 0));
+        assertEquals(startTime, getEventTime(0, 0));
+        assertEquals(startTime + 15000, getEventTime(1, 0));
+        assertEquals(startTime + 30000, getEventTime(2, 0));
+        assertEquals(startTime + 45000, getEventTime(3, 0));
 
         for (int i = 0; i < 4; i++) {
-            assertEquals(1, freqHelper.getTotalRequests(i));
+            assertEquals(1, helper.getTotalRequests(i));
         }
     }
 
@@ -166,37 +176,58 @@ public class FrequencyHelperTest {
      * t4: 45k
      */
     @Test
-    public void case2eTest() {
-        final FrequencyHelper freqHelper = new FrequencyHelper(5);
-        freqHelper.setFrequency(4);
+    public void case2eTest() throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        helper = new FrequencyHelper(5, 4, 4);
 
-        assertEquals(4, freqHelper.getTotalThreads());
+        assertEquals(4, helper.getTotalThreads());
 
-        startTime = getTime();
-        freqHelper.setStartTime(startTime);
+        setStartTime();
 
-        assertEquals(startTime, freqHelper.getEventTime(0, 0));
-        assertEquals(startTime + 15000, freqHelper.getEventTime(1, 0));
-        assertEquals(startTime + 30000, freqHelper.getEventTime(2, 0));
-        assertEquals(startTime + 45000, freqHelper.getEventTime(3, 0));
+        assertEquals(startTime, getEventTime(0, 0));
+        assertEquals(startTime + 15000, getEventTime(1, 0));
+        assertEquals(startTime + 30000, getEventTime(2, 0));
+        assertEquals(startTime + 45000, getEventTime(3, 0));
 
         for (int i = 0; i < 4; i++) {
-            assertEquals(1, freqHelper.getTotalRequests(i));
+            assertEquals(1, helper.getTotalRequests(i));
         }
     }
 
     @Test
-    public void shouldRoundNumbersCorrectly() {
-        final FrequencyHelper freqHelper = new FrequencyHelper(800);
-        freqHelper.setFrequency(14);
+    public void shouldRoundNumbersCorrectly() throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        helper = new FrequencyHelper(800, 14, 14);
 
-        assertEquals(14, freqHelper.getTotalThreads());
+        assertEquals(14, helper.getTotalThreads());
 
-        startTime = getTime();
-        freqHelper.setStartTime(startTime);
+        setStartTime();
 
-        assertEquals(startTime + 4286, freqHelper.getEventTime(1, 0));
-        assertEquals(startTime + 8571, freqHelper.getEventTime(2, 0));
-        assertEquals(startTime + 60000, freqHelper.getEventTime(14, 0));
+        assertEquals(startTime + 4286, getEventTime(1, 0));
+        assertEquals(startTime + 8571, getEventTime(2, 0));
+        assertEquals(startTime + 60000, getEventTime(14, 0));
+    }
+
+    @Test
+    public void testTotalRequestsAfterOneMinute() {
+        helper = new FrequencyHelper(800, 1, 2);
+        assertEquals(1, helper.getTotalRequests(0));
+        assertEquals(1, helper.getTotalRequests(1));
+    }
+
+    @Test
+    public void testEventTimeAfterOneMinute() throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        helper = new FrequencyHelper(800, 1, 2);
+        setStartTime();
+
+        assertEquals(startTime, getEventTime(0, 0));
+        assertEquals(startTime + 60000, getEventTime(1, 0));
+    }
+
+    private long getEventTime(final int threadNumber, final int iteration)
+            throws IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
+        return (long) pvtMethod.invoke(helper, threadNumber, iteration);
     }
 }
