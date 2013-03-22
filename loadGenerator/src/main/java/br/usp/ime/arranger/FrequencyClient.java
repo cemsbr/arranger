@@ -2,17 +2,14 @@ package br.usp.ime.arranger;
 
 import java.net.MalformedURLException;
 import java.util.Calendar;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import br.usp.ime.arranger.behaviors.BehaviorException;
+import br.usp.ime.arranger.utils.ArithmeticMean;
 
 public class FrequencyClient extends AbstractClient implements Runnable {
 
     private static FrequencyHelper freqHelper = null;
-
-    private static AtomicInteger successes;
-    private static AtomicInteger failures;
-    private static double successTime = -1;
+    private static final ArithmeticMean MEAN = new ArithmeticMean();
 
     /**
      * Must set FrequencyHelper and SuccessTime before.
@@ -29,28 +26,18 @@ public class FrequencyClient extends AbstractClient implements Runnable {
         FrequencyClient.freqHelper = freqHelper;
     }
 
-    public static void setSuccessTime(final int successTime) {
-        FrequencyClient.successTime = successTime;
+    public static double getMean() {
+        return MEAN.getMean();
     }
 
     public static void resetStatistics() {
-        successes = new AtomicInteger(0);
-        failures = new AtomicInteger(0);
-    }
-
-    public static int getSuccesses() {
-        return successes.get();
-    }
-
-    public static int getFailures() {
-        return failures.get();
+        MEAN.reset();
     }
 
     @Override
     public void run() throws IllegalStateException {
-        if (freqHelper == null || successTime < 0) {
-            throw new IllegalStateException(
-                    "Must set FrequencyHelper and successTime in FrequencyClient");
+        if (freqHelper == null) {
+            throw new IllegalStateException("FrequencyHelper must be set");
         }
 
         final int requests = freqHelper.getTotalRequests(threadNumber);
@@ -70,7 +57,6 @@ public class FrequencyClient extends AbstractClient implements Runnable {
                 simulate();
             } catch (BehaviorException e) {
                 logError("simulate()", e);
-                failures.incrementAndGet();
             }
         }
     }
@@ -82,7 +68,6 @@ public class FrequencyClient extends AbstractClient implements Runnable {
         if (sleepTime < 0) {
             logError(String.format("Sleep time %d on thread %d, request %d.",
                     sleepTime, threadNumber, request));
-            failures.incrementAndGet();
             canWait = false;
         } else {
             Thread.sleep(sleepTime);
@@ -108,14 +93,6 @@ public class FrequencyClient extends AbstractClient implements Runnable {
 
         final long duration = Calendar.getInstance().getTimeInMillis() - start;
         GRAPH.info(start + "," + duration);
-        checkTime(duration);
-    }
-
-    private void checkTime(final long duration) {
-        if (duration > successTime) {
-            failures.incrementAndGet();
-        } else {
-            successes.incrementAndGet();
-        }
+        MEAN.add(duration);
     }
 }

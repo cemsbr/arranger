@@ -12,7 +12,8 @@ import java.util.Calendar;
  */
 public class FrequencyHelper {
     // period, threadPeriod are in milliseconds.
-    private int maxThreads, executions;
+    private int maxThreads;
+    private int executions = -1;
     private double period, threadPeriod;
     private int frequency, totalThreads;
     private long startTime;
@@ -40,8 +41,8 @@ public class FrequencyHelper {
      * @param executions
      */
     public FrequencyHelper(final int maxThreads, final int executions) {
-        this.executions = executions;
         this.maxThreads = maxThreads;
+        this.executions = executions; // NOPMD
     }
 
     /**
@@ -50,7 +51,16 @@ public class FrequencyHelper {
      *            requests per minute.
      */
     public void setFrequency(final int frequency) {
+        if (executions < 0) {
+            throw new IllegalStateException(
+                    "Cannot set frequency before number of executions.");
+        }
+
         this.frequency = frequency;
+
+        if (frequency > executions) {
+            executions = frequency;
+        }
 
         totalThreads = Math.min(maxThreads, executions);
         period = 60000.0 / frequency;
@@ -59,10 +69,6 @@ public class FrequencyHelper {
 
     public void setStartTime() {
         setStartTime(getCurrentTime());
-    }
-
-    public void setExecutions(final int executions) {
-        this.executions = executions;
     }
 
     public long getSleepTime(final int threadNumber, final int iteration) {

@@ -13,8 +13,8 @@ public final class Frequency extends AbstractLoadGenerator {
     // Requests per minute
     private int minFreq, maxFreq, step;
     // milliseconds
-    private int measurements, maxThreads;
-    private float successRatio;
+    private int maxMean;
+    private int minExecs, maxThreads;
 
     @Override
     public void generateLoad(final String[] args, final int start)
@@ -24,11 +24,11 @@ public final class Frequency extends AbstractLoadGenerator {
     }
 
     public static String getHelpMessage() {
-        return "minFreq maxFreq step measurements successTime successRatio maxThreads";
+        return "minFreq maxFreq step minExecs maxMean(milli) maxThreads";
     }
 
     private void readArgs(final String[] args, final int start) {
-        if (args.length < 7 + start) {
+        if (args.length < 6 + start) {
             throw new IllegalArgumentException();
         }
 
@@ -37,9 +37,8 @@ public final class Frequency extends AbstractLoadGenerator {
             minFreq = Integer.parseInt(args[index++]);
             maxFreq = Integer.parseInt(args[index++]);
             step = Integer.parseInt(args[index++]);
-            measurements = Integer.parseInt(args[index++]);
-            FrequencyClient.setSuccessTime(Integer.parseInt(args[index++]));
-            successRatio = Float.parseFloat(args[index++]);
+            minExecs = Integer.parseInt(args[index++]);
+            maxMean = Integer.parseInt(args[index++]);
             maxThreads = Integer.parseInt(args[index++]);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(e);
@@ -48,7 +47,9 @@ public final class Frequency extends AbstractLoadGenerator {
 
     private void runSimulations() throws MalformedURLException {
         warmUp();
-        freqHelper.setExecutions(measurements);
+
+        freqHelper = new FrequencyHelper(maxThreads, minExecs);
+        FrequencyClient.setFrequencyHelper(freqHelper);
 
         for (int frequency = minFreq; frequency <= maxFreq; frequency += step) {
             freqHelper.setFrequency(frequency);
@@ -56,8 +57,8 @@ public final class Frequency extends AbstractLoadGenerator {
             runSimulation();
 
             if (hasTimedOut()) {
-                final String result = String.format("result: %d/min", frequency
-                        - step);
+                final String result = String.format("max freq: %d/min",
+                        frequency - step);
                 CONSOLE.info(result);
                 GRAPH.info("# " + result);
                 break;
@@ -98,16 +99,12 @@ public final class Frequency extends AbstractLoadGenerator {
     }
 
     private boolean hasTimedOut() {
-        final int failures = FrequencyClient.getFailures();
-        final int successes = FrequencyClient.getSuccesses();
-        final float successRatio = ((float) successes) / (successes + failures);
-
-        final String message = String.format("# successes: %s/%s (%.2f%%)",
-                successes, (failures + successes), successRatio * 100);
+        final double mean = FrequencyClient.getMean();
+        final String message = "# mean = " + mean;
         CONSOLE.info(message);
         GRAPH.info(message);
 
-        return (successRatio < this.successRatio);
+        return (mean > maxMean);
     }
 
     @SuppressWarnings("PMD.WhileLoopsMustUseBraces")

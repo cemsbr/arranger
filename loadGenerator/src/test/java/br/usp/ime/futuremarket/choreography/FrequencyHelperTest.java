@@ -225,6 +225,16 @@ public class FrequencyHelperTest {
         assertEquals(startTime + 60000, getEventTime(1, 0));
     }
 
+    @Test
+    public void testFrequencyHigherThanExecutions() {
+        helper = new FrequencyHelper(500, 100, 30);
+
+        assertEquals(100, helper.getTotalThreads());
+
+        assertEquals(1, helper.getTotalRequests(0));
+        assertEquals(1, helper.getTotalRequests(99));
+    }
+
     private long getEventTime(final int threadNumber, final int iteration)
             throws IllegalAccessException, IllegalArgumentException,
             InvocationTargetException {
