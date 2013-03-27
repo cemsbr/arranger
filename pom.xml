@@ -10,7 +10,6 @@
   <modules>
     <module>frontend</module>
     <module>backend</module>
-    <module>rehearsal</module>
     <module>loadGenerator</module>
   </modules>
 
