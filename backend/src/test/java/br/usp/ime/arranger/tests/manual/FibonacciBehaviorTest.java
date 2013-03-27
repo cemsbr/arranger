@@ -9,7 +9,8 @@ public class FibonacciBehaviorTest {
 
     @Test
     /*
-     * Run "top -d 0.5". Press b, x, y. Highlight CPU column with > or <.
+     * Before, run "top -d 0.5". Press b, x, y. Highlight CPU column with > or
+     * <.
      */
     public void manualTest() throws BehaviorException {
         final FibonacciBehavior fibo = new FibonacciBehavior(957000, 1000);

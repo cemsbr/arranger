@@ -15,7 +15,7 @@ public class PerformerProxyCreator {
 
     private static final String NAMESPACE = "http://service.arranger.ime.usp.br/";
     private static final String SERVICE_NAME = "PerformerImplService";
-    private static Map<String, Service> cache = new HashMap<>();
+    private static final Map<String, Service> CACHE = new HashMap<>();
 
     public Performer getProxy(final String wsdl) throws MalformedURLException {
         final Service service = getService(wsdl);
@@ -29,24 +29,24 @@ public class PerformerProxyCreator {
     }
 
     public static void destroy() {
-        if (!cache.isEmpty()) {
-            synchronized (cache) {
-                if (!cache.isEmpty()) {
-                    cache.clear();
+        if (!CACHE.isEmpty()) {
+            synchronized (CACHE) {
+                if (!CACHE.isEmpty()) {
+                    CACHE.clear();
                 }
             }
         }
     }
 
     private Service getService(final String wsdl) throws MalformedURLException {
-        if (!cache.containsKey(wsdl)) {
-            synchronized (cache) {
-                if (!cache.containsKey(wsdl)) {
+        if (!CACHE.containsKey(wsdl)) {
+            synchronized (CACHE) {
+                if (!CACHE.containsKey(wsdl)) {
                     createService(wsdl);
                 }
             }
         }
-        return cache.get(wsdl);
+        return CACHE.get(wsdl);
     }
 
     private void createService(final String wsdl) throws MalformedURLException {
@@ -54,6 +54,6 @@ public class PerformerProxyCreator {
         final URL url = new URL(wsdl);
         final Service service = Service.create(url, qname);
 
-        cache.put(wsdl, service);
+        CACHE.put(wsdl, service);
     }
 }

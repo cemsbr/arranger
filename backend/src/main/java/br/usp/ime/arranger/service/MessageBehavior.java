@@ -22,7 +22,7 @@ public class MessageBehavior extends AbstractBehavior {
 
     // MTOM will be used for messages of size >= MTOM_THRESHOLD bytes to reduce
     // memory consumption.
-    private static final int MTOM_THRESHOLD = 1024 * 1024;
+    private static int mtomMinSize = 1024 * 1024;
 
     public MessageBehavior(final String destWsdl, final long requestBytes,
             final long responseBytes) {
@@ -44,8 +44,8 @@ public class MessageBehavior extends AbstractBehavior {
     private void talkToPerformer() throws MalformedURLException,
             BehaviorException {
         final Performer performer = COMM.getPerformer(destWsdl);
-        final boolean requestIsBig = (requestBytes >= MTOM_THRESHOLD);
-        final boolean responseIsBig = (responseBytes >= MTOM_THRESHOLD);
+        final boolean requestIsBig = (requestBytes >= mtomMinSize);
+        final boolean responseIsBig = (responseBytes >= mtomMinSize);
 
         if (requestIsBig) {
             makeDataReq(responseIsBig, performer);
@@ -86,6 +86,14 @@ public class MessageBehavior extends AbstractBehavior {
             performer.msgStringReqStringRes(msg, (int) responseBytes);
         }
         LOG.debug("Finished DataHandler request.");
+    }
+
+    public static int getMtomMinSize() {
+        return mtomMinSize;
+    }
+
+    public static void setMtomMinSize(final int bytes) {
+        mtomMinSize = bytes;
     }
 
     // Needed for serialization

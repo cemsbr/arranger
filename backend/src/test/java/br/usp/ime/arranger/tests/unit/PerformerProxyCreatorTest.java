@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.usp.ime.arranger.service.PerformerProxyCreator;
+import br.usp.ime.tests.utils.ReflectionUtils;
 
 public class PerformerProxyCreatorTest {
 
@@ -32,13 +33,12 @@ public class PerformerProxyCreatorTest {
     private static Field cacheField;
 
     @BeforeClass
-    public static void setUpClass() throws NoSuchFieldException,
-            SecurityException {
+    public static void setUpClass() throws Exception {
         wsdl1 = getFileWsdl("performer1.wsdl");
         wsdl2 = getFileWsdl("performer2.wsdl");
 
-        cacheField = PerformerProxyCreator.class.getDeclaredField("cache");
-        cacheField.setAccessible(true);
+        cacheField = ReflectionUtils.setFieldPublic(
+                PerformerProxyCreator.class, "CACHE");
     }
 
     @Before

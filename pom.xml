@@ -36,9 +36,6 @@
         <version>2.13</version>
         <configuration>
           <excludes>
-            <exclude>**/tests/acceptance/**/*.java</exclude>
-            <exclude>**/tests/functional/**/*.java</exclude>
-            <exclude>**/tests/integration/**/*.java</exclude>
             <exclude>**/tests/manual/**/*.java</exclude>
           </excludes>
         </configuration>
