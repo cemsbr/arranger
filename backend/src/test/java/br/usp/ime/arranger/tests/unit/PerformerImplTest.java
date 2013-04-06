@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.usp.ime.arranger.behaviors.Behavior;
@@ -24,9 +25,15 @@ import br.usp.ime.arranger.utils.StringUtils;
 public class PerformerImplTest {
 
     private Performer service;
-    private final Behavior sleep1 = new SleepBehavior(1000);
-    private final Behavior sleep2 = new SleepBehavior(2000);
+    private static Behavior sleep1;
+    private static Behavior sleep2;
     private List<Behavior> beSent, beReceived;
+
+    @BeforeClass
+    public static void setUpClass() throws BehaviorException {
+        sleep1 = new SleepBehavior(1000);
+        sleep2 = new SleepBehavior(2000);
+    }
 
     @Before
     public void setUp() {

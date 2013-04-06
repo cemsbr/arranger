@@ -47,7 +47,7 @@ public class PerformerPublisher {
     }
 
     private String getAddress(final int instance) {
-        return "http://localhost:" + PORT + "/performer" + instance
+        return "http://127.0.0.1:" + PORT + "/performer" + instance
                 + "/endpoint";
     }
 }

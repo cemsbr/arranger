@@ -4,8 +4,15 @@ public class SleepBehavior extends AbstractBehavior {
 
     private long millis;
 
-    public SleepBehavior(final long millis) {
+    public SleepBehavior(final long millis) throws BehaviorException {
         super();
+        setMillis(millis);
+    }
+
+    public final void setMillis(final long millis) throws BehaviorException {
+        if (millis < 0) {
+            throw new BehaviorException("Sleep time cannot be negative");
+        }
         this.millis = millis;
     }
 
@@ -14,7 +21,7 @@ public class SleepBehavior extends AbstractBehavior {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            throw new BehaviorException(e);
+            throw new BehaviorException("Thread.sleep exception", e);
         }
     }
 
@@ -24,9 +31,5 @@ public class SleepBehavior extends AbstractBehavior {
 
     public long getMillis() {
         return millis;
-    }
-
-    public void setMillis(final long millis) {
-        this.millis = millis;
     }
 }
