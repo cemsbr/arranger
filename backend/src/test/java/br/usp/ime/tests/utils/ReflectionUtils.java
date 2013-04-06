@@ -1,6 +1,7 @@
 package br.usp.ime.tests.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public final class ReflectionUtils {
@@ -36,5 +37,14 @@ public final class ReflectionUtils {
 
         field.setAccessible(true);
         mods.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+    }
+
+    public static <T> Method setMethodPublic(final Class<T> clazz,
+            final String methodName, final Class<?>... parameterTypes)
+            throws NoSuchMethodException, SecurityException {
+        final Method method = clazz.getDeclaredMethod(methodName,
+                parameterTypes);
+        method.setAccessible(true);
+        return method;
     }
 }

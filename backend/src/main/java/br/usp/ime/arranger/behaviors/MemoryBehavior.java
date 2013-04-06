@@ -8,35 +8,37 @@ public class MemoryBehavior extends AbstractBehavior {
 
     @Override
     public void run() throws BehaviorException {
-        consumesSquaredSizeArray();
+        final double[] randomFloats = generateRandomArray();
+        changeSign(randomFloats);
     }
 
-    public void setSize(int newSize) {
-        size = newSize;
+    public void setSize(final int size) throws BehaviorException {
+        if (size < 0) {
+            throw new BehaviorException(
+                    "MemoryBehavior cannot have negative size");
+        }
+        this.size = size;
     }
 
     public int getSize() {
         return size;
     }
 
-    private float[] generateRandomArray(float[] v) {
-        Random r;
-        int i, length;
-        length = v.length;
-        r = new Random();
-        for (i = 0; i < length; i++) {
-            v[i] = (float) r.nextDouble();
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    private double[] generateRandomArray() throws BehaviorException {
+        final double[] numbers = new double[size];
+        final Random random = new Random();
+
+        for (int i = 0; i < size; i++) {
+            numbers[i] = random.nextDouble();
         }
-        return v;
+
+        return numbers;
     }
 
-    public float[] consumesSquaredSizeArray() {
-        int i, sizeSquare;
-        sizeSquare = size * size;
-        float[] v = new float[sizeSquare];
-        v = generateRandomArray(v);
-        for (i = 0; i < sizeSquare; i++)
-            v[i] *= -1.0f;
-        return v;
+    private void changeSign(final double[] numbers) {
+        for (int i = 0; i < size; i++) {
+            numbers[i] *= -1;
+        }
     }
 }
