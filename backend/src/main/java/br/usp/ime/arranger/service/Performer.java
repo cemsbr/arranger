@@ -11,12 +11,13 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import br.usp.ime.arranger.behaviors.Behavior;
 import br.usp.ime.arranger.behaviors.BehaviorException;
 import br.usp.ime.arranger.behaviors.FibonacciBehavior;
+import br.usp.ime.arranger.behaviors.MemoryBehavior;
 import br.usp.ime.arranger.behaviors.SleepBehavior;
 
 @WebService
 @SOAPBinding
-@XmlSeeAlso({ FibonacciBehavior.class, MessageBehavior.class,
-        SleepBehavior.class })
+@XmlSeeAlso({ FibonacciBehavior.class, MemoryBehavior.class,
+        MessageBehavior.class, SleepBehavior.class })
 public interface Performer {
 
     @WebMethod

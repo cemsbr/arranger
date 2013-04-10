@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.activation.DataHandler;
 
@@ -17,6 +16,7 @@ import br.usp.ime.arranger.utils.FileCreator;
 
 import com.sun.xml.ws.developer.StreamingDataHandler;
 
+@SuppressWarnings("PMD.AvoidFinalLocalVariable")
 public class PerformerTest {
 
     @Test
@@ -25,9 +25,9 @@ public class PerformerTest {
         final long size = 1024;
 
         final PerformerPublisher publisher = new PerformerPublisher();
-        final List<String> wsdls = publisher.publish(1);
+        final String wsdl = publisher.publish();
         final CommUtils comm = new CommUtils();
-        final Performer performer = comm.getPerformer(wsdls.get(0));
+        final Performer performer = comm.getPerformer(wsdl);
         final DataHandler dataHandler = performer.msgStringReqDataRes("dummy",
                 size);
 

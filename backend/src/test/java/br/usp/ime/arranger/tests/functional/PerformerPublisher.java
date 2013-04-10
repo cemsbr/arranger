@@ -2,48 +2,48 @@ package br.usp.ime.arranger.tests.functional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.ws.Endpoint;
 
+import br.usp.ime.arranger.service.Performer;
 import br.usp.ime.arranger.service.PerformerImpl;
 
 public class PerformerPublisher {
 
     private static final int PORT = 8081;
+    private static final AtomicInteger INSTANCES = new AtomicInteger(0);
     private List<Endpoint> endpoints = new ArrayList<>();
     private List<String> wsdls = new ArrayList<>();
 
     public static void main(final String[] args) {
-        final PerformerPublisher servers = new PerformerPublisher();
-        servers.publish(2);
+        final PerformerPublisher publisher = new PerformerPublisher();
+        publisher.publish(new PerformerImpl());
     }
 
-    /**
-     * Publish endpoints and return their wsdls.
-     * 
-     * @param amount
-     *            of endpoints.
-     * @return a list of wsdls.
-     */
-    public List<String> publish(final int amount) {
-        Endpoint endpoint;
-        String address;
+    public String publish() {
+        return publish(new PerformerImpl());
+    }
 
-        for (int i = 1; i <= amount; i++) {
-            address = getAddress(i);
-            endpoint = Endpoint.publish(address, new PerformerImpl());
-            endpoints.add(endpoint);
-            wsdls.add(address + "?wsdl");
-        }
+    public String publish(final Performer performer) {
+        final String address = getAddress(INSTANCES.getAndIncrement());
+        publish(performer, address);
+        return address;
+    }
 
-        return wsdls;
+    private void publish(final Performer performer, final String address) {
+        Endpoint endpoint = Endpoint.publish(address, performer);
+        endpoints.add(endpoint);
+        wsdls.add(address + "?wsdl");
     }
 
     public void stopAll() {
         for (Endpoint endpoint : endpoints) {
             endpoint.stop();
         }
+        endpoints.clear();
         wsdls.clear();
+        INSTANCES.set(0);
     }
 
     private String getAddress(final int instance) {

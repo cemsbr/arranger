@@ -1,0 +1,93 @@
+package br.usp.ime.arranger.tests.functional;
+
+import static org.junit.Assert.assertEquals;
+
+import java.net.MalformedURLException;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import br.usp.ime.arranger.behaviors.Behavior;
+import br.usp.ime.arranger.behaviors.BehaviorException;
+import br.usp.ime.arranger.behaviors.FibonacciBehavior;
+import br.usp.ime.arranger.behaviors.MemoryBehavior;
+import br.usp.ime.arranger.behaviors.SleepBehavior;
+import br.usp.ime.arranger.service.Performer;
+import br.usp.ime.arranger.service.PerformerProxyCreator;
+
+@SuppressWarnings("PMD.AvoidFinalLocalVariable")
+public class BehaviorsTest {
+
+    private static PerformerPublisher publisher;
+    private static PerformerProxyCreator proxyCreator;
+    private transient Performer webService;
+    private transient Behavior expected;
+
+    @BeforeClass
+    public static void setUpClass() {
+        publisher = new PerformerPublisher();
+        proxyCreator = new PerformerProxyCreator();
+    }
+
+    @After
+    public void tearDown() {
+        publisher.stopAll();
+    }
+
+    @Test
+    public void shouldSetFibonnaciBehavior() throws MalformedURLException,
+            BehaviorException {
+        final int n = 1; // NOPMD
+        final int repetitions = 2;
+        expected = new FibonacciBehavior(n, repetitions);
+
+        publishAndSetBehavior(expected);
+        final FibonacciBehavior actual = (FibonacciBehavior) getFirstBehavior();
+
+        assertEquals(n, actual.getN());
+        assertEquals(repetitions, actual.getRepetitions());
+    }
+
+    @Test
+    public void shouldSetMemoryBehavior() throws MalformedURLException,
+            BehaviorException {
+        final int size = 100;
+        final MemoryBehavior expected = new MemoryBehavior();
+        expected.setSize(size);
+
+        publishAndSetBehavior(expected);
+        final MemoryBehavior actual = (MemoryBehavior) getFirstBehavior();
+
+        assertEquals(size, actual.getSize());
+    }
+
+    @Test
+    public void shouldSetSleepBehavior() throws BehaviorException,
+            MalformedURLException {
+        final long time = 42;
+        expected = new SleepBehavior(42);
+
+        publishAndSetBehavior(expected);
+        final SleepBehavior actual = (SleepBehavior) getFirstBehavior();
+
+        assertEquals(time, actual.getMillis());
+    }
+
+    private Behavior getFirstBehavior() {
+        final List<Behavior> behaviors = webService.getBehaviors();
+        return behaviors.get(0);
+    }
+
+    private void publishAndSetBehavior(final Behavior behavior)
+            throws MalformedURLException, BehaviorException {
+        webService = publish();
+        webService.setBehavior(behavior);
+    }
+
+    private Performer publish() throws MalformedURLException {
+        final String wsdl = publisher.publish();
+        return proxyCreator.getProxy(wsdl);
+    }
+}
