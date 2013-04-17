@@ -25,6 +25,13 @@ public class PerformerPublisher {
         return publish(new PerformerImpl());
     }
 
+    public List<String> publish(final int n) {
+        for (int i = 0; i < n; i++) {
+            publish();
+        }
+        return wsdls;
+    }
+
     public String publish(final Performer performer) {
         final String address = getAddress(INSTANCES.getAndIncrement());
         publish(performer, address);

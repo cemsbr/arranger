@@ -11,6 +11,7 @@
     <module>frontend</module>
     <module>backend</module>
     <module>loadGenerator</module>
+    <module>rehearsal</module>
   </modules>
 
   <properties>
