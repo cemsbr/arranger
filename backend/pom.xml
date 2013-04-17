@@ -11,10 +11,6 @@
 	<artifactId>arranger-backend</artifactId>
 	<packaging>war</packaging>
 
-	<properties>
-		<powermock.version>1.5</powermock.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.sun.xml.ws</groupId>
