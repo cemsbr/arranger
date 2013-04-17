@@ -14,6 +14,7 @@ import br.usp.ime.arranger.behaviors.BehaviorException;
 import br.usp.ime.arranger.behaviors.FibonacciBehavior;
 import br.usp.ime.arranger.behaviors.MemoryBehavior;
 import br.usp.ime.arranger.behaviors.SleepBehavior;
+import br.usp.ime.arranger.service.MessageBehavior;
 import br.usp.ime.arranger.service.Performer;
 import br.usp.ime.arranger.service.PerformerProxyCreator;
 
@@ -64,8 +65,25 @@ public class BehaviorsTest {
     }
 
     @Test
-    public void shouldSetSleepBehavior() throws BehaviorException,
+    public void shoulSetMessageBehavior() throws BehaviorException,
             MalformedURLException {
+        final String wsdl = publisher.publish();
+        final long request = 1;
+        final long response = 2;
+
+        final Behavior expected = new MessageBehavior(wsdl, request, response);
+        webService = proxyCreator.getProxy(wsdl);
+        webService.setBehavior(expected);
+
+        final MessageBehavior actual = (MessageBehavior) getFirstBehavior();
+
+        assertEquals(wsdl, actual.getDestWsdl());
+        assertEquals(request, actual.getRequestBytes());
+        assertEquals(response, actual.getResponseBytes());
+    }
+
+    @Test
+    public void shouldSetSleepBehavior() throws Exception {
         final long time = 42;
         expected = new SleepBehavior(42);
 

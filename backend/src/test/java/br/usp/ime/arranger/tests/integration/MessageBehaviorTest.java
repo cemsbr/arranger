@@ -22,10 +22,11 @@ import br.usp.ime.arranger.service.PerformerImpl;
 import br.usp.ime.arranger.utils.CommUtils;
 import br.usp.ime.tests.utils.ReflectionUtils;
 
+@SuppressWarnings("PMD.SignatureDeclareThrowsException")
 public class MessageBehaviorTest {
 
     private static int mtomMinSize;
-    private Performer performer;
+    private transient Performer performer;
 
     @BeforeClass
     public static void oneTimeSetUp() throws NoSuchFieldException,
