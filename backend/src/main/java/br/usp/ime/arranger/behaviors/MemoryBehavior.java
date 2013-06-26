@@ -6,13 +6,18 @@ public class MemoryBehavior extends AbstractBehavior {
 
     private int size;
 
+    public MemoryBehavior(final int size) throws BehaviorException {
+        super();
+        setSize(size);
+    }
+
     @Override
     public void run() throws BehaviorException {
         final double[] randomFloats = generateRandomArray();
         changeSign(randomFloats);
     }
 
-    public void setSize(final int size) throws BehaviorException {
+    public final void setSize(final int size) throws BehaviorException {
         if (size < 0) {
             throw new BehaviorException(
                     "MemoryBehavior cannot have negative size");
@@ -40,5 +45,10 @@ public class MemoryBehavior extends AbstractBehavior {
         for (int i = 0; i < size; i++) {
             numbers[i] *= -1;
         }
+    }
+
+    // Needed for serialization
+    public MemoryBehavior() {
+        super();
     }
 }

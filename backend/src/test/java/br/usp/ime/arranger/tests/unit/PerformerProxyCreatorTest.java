@@ -34,8 +34,8 @@ public class PerformerProxyCreatorTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        wsdl1 = getFileWsdl("performer1.wsdl");
-        wsdl2 = getFileWsdl("performer2.wsdl");
+        wsdl1 = getFileWsdl("performer0.wsdl");
+        wsdl2 = getFileWsdl("performer1.wsdl");
 
         cacheField = ReflectionUtils.setFieldPublic(
                 PerformerProxyCreator.class, "CACHE");

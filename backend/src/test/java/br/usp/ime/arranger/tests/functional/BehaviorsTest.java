@@ -55,8 +55,7 @@ public class BehaviorsTest {
     public void shouldSetMemoryBehavior() throws MalformedURLException,
             BehaviorException {
         final int size = 100;
-        final MemoryBehavior expected = new MemoryBehavior();
-        expected.setSize(size);
+        expected = new MemoryBehavior(size);
 
         publishAndSetBehavior(expected);
         final MemoryBehavior actual = (MemoryBehavior) getFirstBehavior();
