@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import javax.activation.DataHandler;
 
+import org.junit.After;
 import org.junit.Test;
 
 import br.usp.ime.arranger.behaviors.BehaviorException;
@@ -18,6 +19,11 @@ import com.sun.xml.ws.developer.StreamingDataHandler;
 
 @SuppressWarnings("PMD.AvoidFinalLocalVariable")
 public class PerformerTest {
+
+    @After
+    public void destroy() {
+        CommUtils.destroy();
+    }
 
     @Test
     public void shouldSaveFileOfRequestSize() throws BehaviorException,

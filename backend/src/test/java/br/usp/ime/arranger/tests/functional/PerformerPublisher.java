@@ -18,7 +18,8 @@ public class PerformerPublisher {
 
     public static void main(final String[] args) {
         final PerformerPublisher publisher = new PerformerPublisher();
-        publisher.publish(new PerformerImpl());
+        publisher.publish();
+        publisher.publish();
     }
 
     public String publish() {
@@ -27,14 +28,16 @@ public class PerformerPublisher {
 
     public String publish(final Performer performer) {
         final String address = getAddress(INSTANCES.getAndIncrement());
-        publish(performer, address);
-        return address;
+        return publish(performer, address);
     }
 
-    private void publish(final Performer performer, final String address) {
+    private String publish(final Performer performer, final String address) {
         Endpoint endpoint = Endpoint.publish(address, performer);
         endpoints.add(endpoint);
-        wsdls.add(address + "?wsdl");
+
+        final String wsdl = address + "?wsdl";
+        wsdls.add(wsdl);
+        return wsdl;
     }
 
     public void stopAll() {
