@@ -7,34 +7,34 @@ import br.usp.ime.arranger.behaviors.BehaviorException;
 
 public class SimultaneousClient extends AbstractClient implements Runnable {
 
-    public SimultaneousClient(final int threadNumber)
-            throws MalformedURLException {
-        super(threadNumber);
-    }
+	public SimultaneousClient(final int threadNumber)
+			throws MalformedURLException {
+		super(threadNumber);
+	}
 
-    @Override
-    public void run() {
-        latch.countDown();
-        try {
-            latch.await();
-        } catch (InterruptedException e1) {
-            logError("CountDownLatch await error", e1);
-        }
+	@Override
+	public void run() {
+		latch.countDown();
+		try {
+			latch.await();
+		} catch (InterruptedException e1) {
+			logError("CountDownLatch await error", e1);
+		}
 
-        try {
-            simulate();
-        } catch (BehaviorException e) {
-            logError("simulate()", e);
-        }
-    }
+		try {
+			simulate();
+		} catch (BehaviorException e) {
+			logError("simulate()", e);
+		}
+	}
 
-    @Override
-    protected void simulate() throws BehaviorException {
-        final long start = Calendar.getInstance().getTimeInMillis();
+	@Override
+	protected void simulate() throws BehaviorException {
+		final long start = Calendar.getInstance().getTimeInMillis();
 
-        server.run();
+		server.run();
 
-        final long end = Calendar.getInstance().getTimeInMillis();
-        GRAPH.info(end - start);
-    }
+		final long end = Calendar.getInstance().getTimeInMillis();
+		GRAPH.info(end - start);
+	}
 }

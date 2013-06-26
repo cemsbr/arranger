@@ -12,40 +12,40 @@ import br.usp.ime.arranger.service.PerformerProxyCreator;
 @SuppressWarnings("PMD.MoreThanOneLogger")
 public abstract class AbstractClient {
 
-    protected static final Logger GRAPH = Logger.getLogger("graphsLogger");
-    private static final Logger CONSOLE = Logger
-            .getLogger(AbstractClient.class);
+	protected static final Logger GRAPH = Logger.getLogger("graphsLogger");
+	private static final Logger CONSOLE = Logger
+			.getLogger(AbstractClient.class);
 
-    protected static CountDownLatch latch;
-    protected final int threadNumber;
-    protected final Performer server;
+	protected static CountDownLatch latch;
+	protected final int threadNumber;
+	protected final Performer server;
 
-    private static final PerformerProxyCreator PROXY_CREATOR = new PerformerProxyCreator();
-    private static String wsdl;
+	private static final PerformerProxyCreator PROXY_CREATOR = new PerformerProxyCreator();
+	private static String wsdl;
 
-    protected abstract void simulate() throws BehaviorException;
+	protected abstract void simulate() throws BehaviorException;
 
-    public AbstractClient(final int threadNumber) throws MalformedURLException {
-        CONSOLE.debug("Thread " + threadNumber + " has started.");
-        this.threadNumber = threadNumber;
-        server = PROXY_CREATOR.getProxy(wsdl);
-    }
+	public AbstractClient(final int threadNumber) throws MalformedURLException {
+		CONSOLE.debug("Thread " + threadNumber + " has started.");
+		this.threadNumber = threadNumber;
+		server = PROXY_CREATOR.getProxy(wsdl);
+	}
 
-    public static void setWsdl(final String wsdl) {
-        AbstractClient.wsdl = wsdl;
-    }
+	public static void setWsdl(final String wsdl) {
+		AbstractClient.wsdl = wsdl;
+	}
 
-    public static void setCountDownLatch(final CountDownLatch latch) {
-        AbstractClient.latch = latch;
-    }
+	public static void setCountDownLatch(final CountDownLatch latch) {
+		AbstractClient.latch = latch;
+	}
 
-    protected void logError(final String message) {
-        GRAPH.error("# ERROR " + message);
-        CONSOLE.error(message);
-    }
+	protected void logError(final String message) {
+		GRAPH.error("# ERROR " + message);
+		CONSOLE.error(message);
+	}
 
-    protected void logError(final String message, final Exception exception) {
-        GRAPH.error("# ERROR " + message);
-        CONSOLE.error(message, exception);
-    }
+	protected void logError(final String message, final Exception exception) {
+		GRAPH.error("# ERROR " + message);
+		CONSOLE.error(message, exception);
+	}
 }

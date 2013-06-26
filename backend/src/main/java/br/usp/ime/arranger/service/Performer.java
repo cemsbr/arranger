@@ -16,36 +16,36 @@ import br.usp.ime.arranger.behaviors.SleepBehavior;
 
 @WebService
 @SOAPBinding
-@XmlSeeAlso({ FibonacciBehavior.class, MemoryBehavior.class,
-        MessageBehavior.class, SleepBehavior.class })
+@XmlSeeAlso({FibonacciBehavior.class, MemoryBehavior.class,
+		MessageBehavior.class, SleepBehavior.class})
 public interface Performer {
 
-    @WebMethod
-    boolean setBehaviors(final List<Behavior> behaviors)
-            throws BehaviorException;
+	@WebMethod
+	boolean setBehaviors(final List<Behavior> behaviors)
+			throws BehaviorException;
 
-    @WebMethod
-    boolean setBehavior(final Behavior behavior) throws BehaviorException;
+	@WebMethod
+	boolean setBehavior(final Behavior behavior) throws BehaviorException;
 
-    @WebMethod
-    String msgStringReqStringRes(final String request, final int responseBytes)
-            throws BehaviorException;
+	@WebMethod
+	String msgStringReqStringRes(final String request, final int responseBytes)
+			throws BehaviorException;
 
-    @WebMethod
-    String msgDataReqStringRes(final DataHandler request,
-            final int responseBytes) throws BehaviorException;
+	@WebMethod
+	String msgDataReqStringRes(final DataHandler request,
+			final int responseBytes) throws BehaviorException;
 
-    @WebMethod
-    DataHandler msgStringReqDataRes(final String request,
-            final long responseBytes) throws BehaviorException;
+	@WebMethod
+	DataHandler msgStringReqDataRes(final String request,
+			final long responseBytes) throws BehaviorException;
 
-    @WebMethod
-    DataHandler msgDataReqDataRes(final DataHandler request,
-            final long responseBytes) throws BehaviorException;
+	@WebMethod
+	DataHandler msgDataReqDataRes(final DataHandler request,
+			final long responseBytes) throws BehaviorException;
 
-    @WebMethod
-    void run() throws BehaviorException;
+	@WebMethod
+	void run() throws BehaviorException;
 
-    @WebMethod
-    List<Behavior> getBehaviors();
+	@WebMethod
+	List<Behavior> getBehaviors();
 }

@@ -25,74 +25,74 @@ import br.usp.ime.tests.utils.ReflectionUtils;
 @SuppressWarnings("PMD.SignatureDeclareThrowsException")
 public class MessageBehaviorTest {
 
-    private static int mtomMinSize;
-    private transient Performer performer;
+	private static int mtomMinSize;
+	private transient Performer performer;
 
-    @BeforeClass
-    public static void oneTimeSetUp() throws NoSuchFieldException,
-            SecurityException, IllegalArgumentException, IllegalAccessException {
-        mtomMinSize = MessageBehavior.getMtomMinSize();
-        ReflectionUtils.setFieldPublic(MessageBehavior.class, "COMM");
-    }
+	@BeforeClass
+	public static void oneTimeSetUp() throws NoSuchFieldException,
+			SecurityException, IllegalArgumentException, IllegalAccessException {
+		mtomMinSize = MessageBehavior.getMtomMinSize();
+		ReflectionUtils.setFieldPublic(MessageBehavior.class, "COMM");
+	}
 
-    @Test
-    public void testBigRequestBigResponse() throws Exception {
-        performer = mockMessage();
-        new MessageBehavior("", mtomMinSize, mtomMinSize).run();
+	@Test
+	public void testBigRequestBigResponse() throws Exception {
+		performer = mockMessage();
+		new MessageBehavior("", mtomMinSize, mtomMinSize).run();
 
-        verify(performer, times(1)).msgDataReqDataRes(any(DataHandler.class),
-                anyLong());
-    }
+		verify(performer, times(1)).msgDataReqDataRes(any(DataHandler.class),
+				anyLong());
+	}
 
-    @Test
-    public void testSmallRequestSmallResponse() throws Exception {
-        final int size = mtomMinSize - 1;
-        performer = mockMessage();
-        new MessageBehavior("", size, size).run();
+	@Test
+	public void testSmallRequestSmallResponse() throws Exception {
+		final int size = mtomMinSize - 1;
+		performer = mockMessage();
+		new MessageBehavior("", size, size).run();
 
-        verify(performer, times(1))
-                .msgStringReqStringRes(anyString(), anyInt());
-    }
+		verify(performer, times(1))
+				.msgStringReqStringRes(anyString(), anyInt());
+	}
 
-    @Test
-    public void testBigRequestSmallResponse() throws Exception {
-        performer = mockMessage();
-        new MessageBehavior("", mtomMinSize, mtomMinSize - 1).run();
+	@Test
+	public void testBigRequestSmallResponse() throws Exception {
+		performer = mockMessage();
+		new MessageBehavior("", mtomMinSize, mtomMinSize - 1).run();
 
-        verify(performer, times(1)).msgDataReqStringRes(any(DataHandler.class),
-                anyInt());
-    }
+		verify(performer, times(1)).msgDataReqStringRes(any(DataHandler.class),
+				anyInt());
+	}
 
-    @Test
-    public void testSmallRequestBigResponse() throws Exception {
-        performer = mockMessage();
-        new MessageBehavior("", mtomMinSize - 1, mtomMinSize).run();
+	@Test
+	public void testSmallRequestBigResponse() throws Exception {
+		performer = mockMessage();
+		new MessageBehavior("", mtomMinSize - 1, mtomMinSize).run();
 
-        verify(performer, times(1)).msgStringReqDataRes(anyString(), anyLong());
-    }
+		verify(performer, times(1)).msgStringReqDataRes(anyString(), anyLong());
+	}
 
-    @Test
-    public void testMalformedUrl() throws Exception {
-        ReflectionUtils
-                .setField(MessageBehavior.class, "COMM", new CommUtils());
-        final String url = "****";
-        final String expectedMsg = "MalformedURL: " + url + ".";
-        final MessageBehavior msg = new MessageBehavior(url, 42, 42);
-        try {
-            msg.run();
-            fail();
-        } catch (Exception e) {
-            assertEquals(expectedMsg, e.getMessage());
-        }
-    }
+	@Test
+	public void testMalformedUrl() throws Exception {
+		ReflectionUtils
+				.setField(MessageBehavior.class, "COMM", new CommUtils());
+		final String url = "****";
+		final String expectedMsg = "MalformedURL: " + url + ".";
+		final MessageBehavior msg = new MessageBehavior(url, 42, 42);
+		try {
+			msg.run();
+			fail();
+		} catch (Exception e) {
+			assertEquals(expectedMsg, e.getMessage());
+		}
+	}
 
-    private Performer mockMessage() throws Exception {
-        performer = mock(PerformerImpl.class);
-        final CommUtils comm = mock(CommUtils.class);
-        when(comm.getPerformer(anyString())).thenReturn(performer);
+	private Performer mockMessage() throws Exception {
+		performer = mock(PerformerImpl.class);
+		final CommUtils comm = mock(CommUtils.class);
+		when(comm.getPerformer(anyString())).thenReturn(performer);
 
-        ReflectionUtils.setField(MessageBehavior.class, "COMM", comm);
+		ReflectionUtils.setField(MessageBehavior.class, "COMM", comm);
 
-        return performer;
-    }
+		return performer;
+	}
 }

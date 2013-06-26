@@ -9,7 +9,7 @@ import com.sun.xml.bind.AnyTypeAdapter;
 @XmlJavaTypeAdapter(AnyTypeAdapter.class)
 public interface Behavior {
 
-    void run() throws BehaviorException;
+	void run() throws BehaviorException;
 
-    void destroy() throws BehaviorException;
+	void destroy() throws BehaviorException;
 }

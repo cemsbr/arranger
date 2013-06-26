@@ -11,22 +11,22 @@ import br.usp.ime.arranger.service.PerformerProxyCreator;
 
 public class Arranger {
 
-    private transient final PerformerProxyCreator clientCreator = new PerformerProxyCreator();
+	private transient final PerformerProxyCreator clientCreator = new PerformerProxyCreator();
 
-    public static final int MB = 1024 * 1024; // NOPMD
+	public static final int MB = 1024 * 1024; // NOPMD
 
-    public void deploy(final ArrangerGraph graph) throws MalformedURLException,
-            BehaviorException {
-        final Collection<PerformerNode> webServices = graph.getVertices();
-        for (PerformerNode webService : webServices) {
-            setBehavior(webService);
-        }
-    }
+	public void deploy(final ArrangerGraph graph) throws MalformedURLException,
+			BehaviorException {
+		final Collection<PerformerNode> webServices = graph.getVertices();
+		for (PerformerNode webService : webServices) {
+			setBehavior(webService);
+		}
+	}
 
-    private void setBehavior(final PerformerNode webService)
-            throws MalformedURLException, BehaviorException {
-        final List<Behavior> behaviors = webService.getBehaviors();
-        final Performer realWs = clientCreator.getProxy(webService.getWsdl());
-        realWs.setBehaviors(behaviors);
-    }
+	private void setBehavior(final PerformerNode webService)
+			throws MalformedURLException, BehaviorException {
+		final List<Behavior> behaviors = webService.getBehaviors();
+		final Performer realWs = clientCreator.getProxy(webService.getWsdl());
+		realWs.setBehaviors(behaviors);
+	}
 }

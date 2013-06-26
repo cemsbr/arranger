@@ -22,54 +22,54 @@ import com.sun.xml.ws.developer.StreamingDataHandler;
  */
 public class CommUtils {
 
-    private static final Logger LOG = LogManager.getLogger(CommUtils.class
-            .getName());
+	private static final Logger LOG = LogManager.getLogger(CommUtils.class
+			.getName());
 
-    public Performer getPerformer(final String wsdl)
-            throws MalformedURLException {
-        final PerformerProxyCreator proxyCreator = new PerformerProxyCreator();
-        return proxyCreator.getProxy(wsdl);
-    }
+	public Performer getPerformer(final String wsdl)
+			throws MalformedURLException {
+		final PerformerProxyCreator proxyCreator = new PerformerProxyCreator();
+		return proxyCreator.getProxy(wsdl);
+	}
 
-    public DataHandler getDataHandler(final long sizeInBytes)
-            throws BehaviorException {
-        final FileCreator creator = new FileCreator();
-        DataHandler dataHandler = null;
+	public DataHandler getDataHandler(final long sizeInBytes)
+			throws BehaviorException {
+		final FileCreator creator = new FileCreator();
+		DataHandler dataHandler = null;
 
-        try {
-            final File reqFile = creator.getFileOfSize(sizeInBytes);
-            LOG.debug("Using file " + reqFile.getAbsolutePath() + ".");
-            final DataSource dataSource = new FileDataSource(reqFile);
-            dataHandler = new DataHandler(dataSource);
-        } catch (IOException e) {
-            throw new BehaviorException("Exception while creating file.", e);
-        }
+		try {
+			final File reqFile = creator.getFileOfSize(sizeInBytes);
+			LOG.debug("Using file " + reqFile.getAbsolutePath() + ".");
+			final DataSource dataSource = new FileDataSource(reqFile);
+			dataHandler = new DataHandler(dataSource);
+		} catch (IOException e) {
+			throw new BehaviorException("Exception while creating file.", e);
+		}
 
-        return dataHandler;
-    }
+		return dataHandler;
+	}
 
-    public String getStringMessage(final int sizeInBytes) {
-        final StringUtils strUtil = new StringUtils();
-        return strUtil.getStringOfLength(sizeInBytes);
-    }
+	public String getStringMessage(final int sizeInBytes) {
+		final StringUtils strUtil = new StringUtils();
+		return strUtil.getStringOfLength(sizeInBytes);
+	}
 
-    public void receiveDataHandler(final DataHandler dataHandler)
-            throws BehaviorException {
-        final StreamingDataHandler stream = (StreamingDataHandler) dataHandler;
-        try {
-            final File file = FileCreator.createTempFile();
-            LOG.debug("Created file " + file.getAbsolutePath());
-            stream.moveTo(file);
-            stream.close();
-            file.delete();
-        } catch (IOException e) {
-            throw new BehaviorException("Couldn't save data handler to file.",
-                    e);
-        }
-    }
+	public void receiveDataHandler(final DataHandler dataHandler)
+			throws BehaviorException {
+		final StreamingDataHandler stream = (StreamingDataHandler) dataHandler;
+		try {
+			final File file = FileCreator.createTempFile();
+			LOG.debug("Created file " + file.getAbsolutePath());
+			stream.moveTo(file);
+			stream.close();
+			file.delete();
+		} catch (IOException e) {
+			throw new BehaviorException("Couldn't save data handler to file.",
+					e);
+		}
+	}
 
-    public static void destroy() {
-        PerformerProxyCreator.destroy();
-        FileCreator.destroy();
-    }
+	public static void destroy() {
+		PerformerProxyCreator.destroy();
+		FileCreator.destroy();
+	}
 }
