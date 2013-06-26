@@ -1,4 +1,5 @@
 *.log
+*.swp
 */.classpath
 */target/
 .pmd
