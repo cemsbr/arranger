@@ -33,7 +33,8 @@ public class PerformerProxyCreatorTest {
 	private static Field cacheField;
 
 	@BeforeClass
-	public static void setUpClass() throws Exception {
+	public static void setUpClass() throws NoSuchFieldException,
+			SecurityException, IllegalArgumentException, IllegalAccessException {
 		wsdl1 = getFileWsdl("performer0.wsdl");
 		wsdl2 = getFileWsdl("performer1.wsdl");
 

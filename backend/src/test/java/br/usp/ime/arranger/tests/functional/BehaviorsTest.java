@@ -82,7 +82,8 @@ public class BehaviorsTest {
 	}
 
 	@Test
-	public void shouldSetSleepBehavior() throws Exception {
+	public void shouldSetSleepBehavior() throws BehaviorException,
+			MalformedURLException {
 		final long time = 42;
 		expected = new SleepBehavior(42);
 
